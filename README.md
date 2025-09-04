@@ -1,7 +1,7 @@
 # EduMap--Backend
 Backend for Interaction Design Studio Capstone Project 
 
-# Description of EduMap
+# Description
 EduMap is an interactive website designed to support incoming university students, particularly high school graduates in making informed decisions about their degree and university life.
 
 Three MVP features
