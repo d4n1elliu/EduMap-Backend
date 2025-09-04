@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EduMapBackend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aea9939734f0ea84bad82e30532ad19f3d1715c1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+22aed2ef62aa3ced879e20d23be1e2c0ed43612c")]
 [assembly: System.Reflection.AssemblyProductAttribute("EduMapBackend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EduMapBackend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
