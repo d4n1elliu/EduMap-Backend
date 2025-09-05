@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduMapBackend", "EduMapBackend\EduMapBackend.csproj", "{50AF1F04-4F3B-961A-6A61-CAAD7461531B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduMap-Backend", "EduMap-Backend.csproj", "{9988B922-4576-D493-9F58-500BDD02862F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +10,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{50AF1F04-4F3B-961A-6A61-CAAD7461531B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50AF1F04-4F3B-961A-6A61-CAAD7461531B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50AF1F04-4F3B-961A-6A61-CAAD7461531B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50AF1F04-4F3B-961A-6A61-CAAD7461531B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9988B922-4576-D493-9F58-500BDD02862F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9988B922-4576-D493-9F58-500BDD02862F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9988B922-4576-D493-9F58-500BDD02862F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9988B922-4576-D493-9F58-500BDD02862F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BEC21045-6988-4DB6-AF38-B25859F04DBF}
+		SolutionGuid = {ED5EAE9B-D9B9-42CA-A9E4-6BF57248061C}
 	EndGlobalSection
 EndGlobal
