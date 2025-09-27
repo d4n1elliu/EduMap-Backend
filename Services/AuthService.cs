@@ -27,12 +27,6 @@ public class AuthService
         if (await _context.Users.AnyAsync(u => u.Email == request.Email)) // Check if the email is already registered
             return (false, "Email is already registered.", null);
 
-        if (await _context.Users.AnyAsync(u => u.StudentNumber == request.StudentNumber) && !string.IsNullOrEmpty(request.StudentNumber))
-            return (false, "Student number is already used.", null);
-
-        if (string.IsNullOrEmpty(request.StudentNumber))
-            return (false, "Student number is invalid.", null);
-
         if (!IsValidEmail(request.Email))
             return (false, "Email is invalid.", null);
 
@@ -64,7 +58,6 @@ public class AuthService
             Email = request.Email,
             Username = request.Username,
             PasswordHash = HashPassword(request.Password),
-            StudentNumber = request.StudentNumber,
             CreationDate = DateTime.UtcNow
         };
 
