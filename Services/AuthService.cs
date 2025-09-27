@@ -30,15 +30,6 @@ public class AuthService
         if (!IsValidEmail(request.Email))
             return (false, "Email is invalid.", null);
 
-        if (await _context.Users.AnyAsync(u => u.Username == request.Username))
-            return (false, "Username is already used.", null);
-
-        if (!IsValidUsername(request.Username))
-            return (false, "Username is invalid.", null);
-
-        if (string.IsNullOrEmpty(request.Username))
-            return (false, "Username is invalid.", null);
-
         if (request.Password.Length < 8)
             return (false, "Password must be at least 8 characters", null);
 
@@ -56,7 +47,6 @@ public class AuthService
         User newUser = new User
         {
             Email = request.Email,
-            Username = request.Username,
             PasswordHash = HashPassword(request.Password),
             CreationDate = DateTime.UtcNow
         };
@@ -75,7 +65,7 @@ public class AuthService
 
     public async Task<(bool Success, string Message, AuthResponse? responseData)> LoginUserAsync(LoginRequest request)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username || u.Email == request.Username); // Look for the username that matches with the login username
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Username); // Look for the username that matches with the login username
 
         if (user == null || !VerifyPassword(request.Password, user.PasswordHash)) // Check if the username exists and password is correct
             return (false, "Invalid username/email or password.", null);
