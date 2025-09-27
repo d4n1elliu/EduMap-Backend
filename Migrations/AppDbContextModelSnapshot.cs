@@ -37,14 +37,6 @@ namespace EduMap_Backend.Migrations
                     b.Property<string>("ProfileImageURL")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("StudentNumber")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
                     b.ToTable("Users");
