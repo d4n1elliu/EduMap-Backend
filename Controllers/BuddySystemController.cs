@@ -52,8 +52,8 @@ public class BuddySystemController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("confirm-booking")]
-    public async Task<IActionResult> ConfirmBookings(int bookingId)
+    [HttpPost("confirm-booking")]
+    public async Task<IActionResult> ConfirmBookings([FromBody] int bookingId)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
