@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduMap_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251010033922_Alot")]
-    partial class Alot
+    [Migration("20251010034801_ResetMigrations")]
+    partial class ResetMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
