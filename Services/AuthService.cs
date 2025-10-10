@@ -48,7 +48,10 @@ public class AuthService
         {
             Email = request.Email,
             PasswordHash = HashPassword(request.Password),
-            CreationDate = DateTime.UtcNow
+            CreationDate = DateTime.UtcNow,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Role = request.Role
         };
 
         _context.Users.Add(newUser); // Add the user object to the context
@@ -77,6 +80,22 @@ public class AuthService
 
         // If login is successful, frontend will receive the jwt token
         return (true, "Successfully logged in.", responseData);
+    }
+
+    public async Task<(bool Success, string Message, Models.Responses.AuthResponse? responseData)> TokenLoginUserAsync(int userId)
+    {
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId); // Look for the userId that matches with the login userId
+
+        if (user == null) // Check if the user exists
+            return (false, "Please relogin", null);
+
+
+        AuthResponse authResponse = new AuthResponse
+        {
+            JwtToken = GenerateJwtToken(user)
+        };
+
+        return (true, "Successfully logged in.", authResponse);
     }
 
     private bool IsValidEmail(string email)

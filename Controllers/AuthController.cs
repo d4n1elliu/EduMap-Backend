@@ -3,6 +3,7 @@ using EduMap.Models.Requests;
 using EduMap.Models.Responses;
 using EduMap.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace EduMap.Controllers;
 
@@ -35,6 +36,20 @@ public class AuthController : ControllerBase
 
         if (!result.Success)
             return BadRequest(new ApiResponse<AuthResponse?>(result.Message, null));
+
+        return Ok(new ApiResponse<AuthResponse?>(result.Message, result.responseData));
+    }
+
+    [Authorize]
+    [HttpPost("token")]
+    public async Task<IActionResult> Token()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+            return BadRequest(new ApiResponse<object>("Please relogin"));
+
+        var result = await _authService.TokenLoginUserAsync(int.Parse(userIdClaim));
 
         return Ok(new ApiResponse<AuthResponse?>(result.Message, result.responseData));
     }

@@ -428,9 +428,6 @@ project.nuget.cache
 artifacts/
 packages/
 
-# Entity Framework (⚠️ remove this line if you want to track migrations)
-Migrations/
-
 # JetBrains Rider / ReSharper
 .idea/
 *.iml

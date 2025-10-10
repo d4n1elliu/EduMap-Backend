@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using EduMap.Models.Requests;
 using EduMap.Models.Responses;
 using EduMap.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace EduMap.Controllers;
 
@@ -16,10 +18,49 @@ public class BuddySystemController : ControllerBase
         _bookingService = bookingService;
     }
 
-    [HttpPost("booking")]
+    [HttpPost("create-booking")]
     public async Task<IActionResult> Register([FromBody] BookingRequest request)
     {
-        var result = await _bookingService.BookMentorsAsync(request);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+            return BadRequest(new ApiResponse<object>("Please relogin"));
+
+        var result = await _bookingService.BookMentorsAsync(request, int.Parse(userIdClaim));
+
+        if (!result.Success)
+            return BadRequest(new ApiResponse<object>(result.Message));
+
+        return Ok(new ApiResponse<object>(result.Message));
+    }
+
+    [Authorize]
+    [HttpGet("get-bookings")]
+    public async Task<IActionResult> GetBookings()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+            return BadRequest(new ApiResponse<object>("Please relogin"));
+
+        var result = await _bookingService.GetMentorBookingsAsync(int.Parse(userIdClaim));
+
+        if (!result.Success)
+            return BadRequest(new ApiResponse<object>(result.Message));
+
+        return Ok(new ApiResponse<object>(result.Message));
+    }
+
+    [Authorize]
+    [HttpGet("confirm-booking")]
+    public async Task<IActionResult> ConfirmBookings(int bookingId)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim))
+            return BadRequest(new ApiResponse<object>("Please relogin"));
+
+        var result = await _bookingService.ConfirmBookingAsync(int.Parse(userIdClaim), bookingId);
 
         if (!result.Success)
             return BadRequest(new ApiResponse<object>(result.Message));
