@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EduMap.Models.Entities;
+namespace EduMap.Models.Requests;
 
-public class Booking
+public class BookingRequest
 {
-    public int Id { get; set; }
     public required DateTime StartTime { get; set; }
     public required TimeSpan Duration { get; set; }
-    public required int UserId { get; set;}
     public required int MentorId { get; set; }
-}
+
+}   

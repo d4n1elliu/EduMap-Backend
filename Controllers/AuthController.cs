@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using EduMap.Models.Requests;
 using EduMap.Models.Responses;
 using EduMap.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EduMap.Controllers;
 
@@ -37,5 +38,6 @@ public class AuthController : ControllerBase
 
         return Ok(new ApiResponse<AuthResponse?>(result.Message, result.responseData));
     }
+
 }
 
