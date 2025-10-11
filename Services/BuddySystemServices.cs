@@ -58,6 +58,24 @@ public class BuddySystemServices
         return (true, "Success", bookingsResponse);
     }
 
+    public async Task<(bool Success, string Message, List<MentorResponse> Mentors)> GetMentorsAsync()
+    {
+        List<User> mentors = await _context.Users.Where(u => u.Role == Role.Mentor).ToListAsync();
+
+        List<MentorResponse> mentorsResponse = mentors.Select(u => new MentorResponse
+        {
+            Id = u.Id,
+            Email = u.Email,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            ProfileImageURL = u.ProfileImageURL,
+            CreationDate = u.CreationDate,
+            Role = u.Role,
+            Course = u.Course
+        }).ToList();
+
+        return (true, "Success", mentorsResponse);
+    }
 
     public async Task<(bool Success, string Message)> ConfirmBookingAsync(int userId, int bookingId)
     {
@@ -65,7 +83,6 @@ public class BuddySystemServices
 
         if (user == null)
             return (false, "User not found");
-
 
         if (user.Role != Role.Student)
             return (false, "You must be a mentor to accept the booking");

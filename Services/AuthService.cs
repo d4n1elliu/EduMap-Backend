@@ -78,6 +78,16 @@ public class AuthService
             JwtToken = GenerateJwtToken(user)
         };
 
+        var isValid = ValidateToken(responseData.JwtToken);
+        Console.WriteLine(responseData.JwtToken);
+    
+    if (!isValid)
+    {
+        // Log the validation failure
+        Console.WriteLine($"Generated token failed validation for user {user.Id}");
+        return (false, "Token generation failed. Please try again.", null);
+    }
+
         // If login is successful, frontend will receive the jwt token
         return (true, "Successfully logged in.", responseData);
     }
@@ -98,6 +108,49 @@ public class AuthService
         return (true, "Successfully logged in.", authResponse);
     }
 
+    private bool ValidateToken(string token)
+{
+    try
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var secretKey = Environment.GetEnvironmentVariable("Jwt_SecretKey");
+        
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            Console.WriteLine("Jwt_SecretKey environment variable is missing");
+            return false;
+        }
+
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = Environment.GetEnvironmentVariable("Jwt_Issuer"),
+            ValidAudience = Environment.GetEnvironmentVariable("Jwt_Audience"),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            ClockSkew = TimeSpan.Zero // No tolerance for immediate validation
+        };
+
+        // This will throw an exception if the token is invalid
+        var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+        
+        Console.WriteLine($"Token validation successful for user: {principal.FindFirst(ClaimTypes.NameIdentifier)?.Value}");
+        return true;
+    }
+    catch (SecurityTokenException ex)
+    {
+        Console.WriteLine($"Token validation failed: {ex.Message}");
+        return false;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Unexpected error during token validation: {ex.Message}");
+        return false;
+    }
+}
+
     private bool IsValidEmail(string email)
     {
         string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
@@ -116,6 +169,10 @@ public class AuthService
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         };
+
+        Console.WriteLine(Environment.GetEnvironmentVariable("Jwt_Issuer"));
+        Console.WriteLine(Environment.GetEnvironmentVariable("Jwt_Audience"));
+        Console.WriteLine(Environment.GetEnvironmentVariable("Jwt_SecretKey"));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_SecretKey")));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

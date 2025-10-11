@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using dotenv.net;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace EduMap;
 
@@ -46,34 +48,21 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<BuddySystemServices>(); 
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
         builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ClockSkew = TimeSpan.Zero,
-
-                ValidIssuer = Environment.GetEnvironmentVariable("Jwt_Issuer"),
-                ValidAudience = Environment.GetEnvironmentVariable("Jwt_Audience"),
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_SecretKey"))),
-            };
-        });
+{
+    options.DefaultAuthenticateScheme = "Bearer";
+    options.DefaultChallengeScheme = "Bearer";
+});
 
         var app = builder.Build();
 
         app.UseCors("AllowFrontend");
+        app.UseRouting();
 
         app.UseDefaultFiles();
         app.UseStaticFiles();
@@ -89,10 +78,41 @@ public class Program
             app.UseSwaggerUI(); // Optional: UI at /swagger
         }
 
+        // Custom middleware
+app.Use(async (context, next) =>
+{
+    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+    {
+        var token = authHeader.Substring("Bearer ".Length).Trim();
+        try
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var validationParams = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = Environment.GetEnvironmentVariable("Jwt_Issuer"),
+                ValidAudience = Environment.GetEnvironmentVariable("Jwt_Audience"),
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_SecretKey"))),
+                ValidateLifetime = true
+            };
+            
+            var principal = handler.ValidateToken(token, validationParams, out _);
+            context.User = principal; // Set the user manually
+        }
+        catch
+        {
+            // Token validation failed
+        }
+    }
+    await next();
+});
+
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        app.MapFallbackToFile("index.html");
 
         app.Run();
     }
