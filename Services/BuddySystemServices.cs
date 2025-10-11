@@ -6,11 +6,11 @@ using EduMap.Models.Entities;
 
 namespace EduMap.Services;
 
-public class BuddySystenServices
+public class BuddySystemServices
 {
     private readonly AppDbContext _context;
 
-    public BuddySystenServices(AppDbContext context)
+    public BuddySystemServices(AppDbContext context)
     {
         _context = context;
     }

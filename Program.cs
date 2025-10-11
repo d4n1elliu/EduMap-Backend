@@ -78,8 +78,6 @@ public class Program
         app.UseDefaultFiles();
         app.UseStaticFiles();
 
-        app.MapFallbackToFile("index.html");
-
         if (!app.Environment.IsDevelopment())
         {
             app.UseHttpsRedirection();
@@ -94,6 +92,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+        app.MapFallbackToFile("index.html");
 
         app.Run();
     }

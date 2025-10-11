@@ -11,9 +11,9 @@ namespace EduMap.Controllers;
 [Route("api/[controller]")]
 public class BuddySystemController : ControllerBase
 {
-    private readonly BuddySystenServices _bookingService;
+    private readonly BuddySystemServices _bookingService;
 
-    public BuddySystemController(BuddySystenServices bookingService)
+    public BuddySystemController(BuddySystemServices bookingService)
     {
         _bookingService = bookingService;
     }
