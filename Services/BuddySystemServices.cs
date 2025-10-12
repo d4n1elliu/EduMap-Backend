@@ -50,7 +50,7 @@ public class BuddySystemServices
             FirstName = b.User.FirstName,
             LastName = b.User.LastName,
             StartTime = b.StartTime,
-            IsConfiemd = b.IsConfirmed,
+            IsConfimed = b.IsConfirmed,
             Course = b.User.Course
         }).ToList();
 

@@ -8,5 +8,5 @@ public class BookingResponse
     public required string LastName { get; set; }
     public required Course? Course { get; set; }
     public required DateTime StartTime { get; set; }
-    public required bool IsConfiemd { get; set; }
+    public required bool IsConfimed { get; set; }
 }
