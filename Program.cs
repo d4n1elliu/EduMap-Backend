@@ -48,7 +48,7 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddScoped<AuthService>();
-        builder.Services.AddScoped<BuddySystemServices>(); 
+        builder.Services.AddScoped<BuddySystemServices>();
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -79,36 +79,36 @@ public class Program
         }
 
         // Custom middleware
-app.Use(async (context, next) =>
-{
-    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
-    {
-        var token = authHeader.Substring("Bearer ".Length).Trim();
-        try
+        app.Use(async (context, next) =>
         {
-            var handler = new JwtSecurityTokenHandler();
-            var validationParams = new TokenValidationParameters
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidIssuer = Environment.GetEnvironmentVariable("Jwt_Issuer"),
-                ValidAudience = Environment.GetEnvironmentVariable("Jwt_Audience"),
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_SecretKey"))),
-                ValidateLifetime = true
-            };
-            
-            var principal = handler.ValidateToken(token, validationParams, out _);
-            context.User = principal; // Set the user manually
-        }
-        catch
-        {
-            // Token validation failed
-        }
-    }
-    await next();
-});
+                var token = authHeader.Substring("Bearer ".Length).Trim();
+                try
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var validationParams = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = Environment.GetEnvironmentVariable("Jwt_Issuer"),
+                        ValidAudience = Environment.GetEnvironmentVariable("Jwt_Audience"),
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_SecretKey"))),
+                        ValidateLifetime = true
+                    };
+
+                    var principal = handler.ValidateToken(token, validationParams, out _);
+                    context.User = principal; // Set the user manually
+                }
+                catch
+                {
+                    // Token validation failed
+                }
+            }
+            await next();
+        });
 
         app.UseAuthentication();
         app.UseAuthorization();
