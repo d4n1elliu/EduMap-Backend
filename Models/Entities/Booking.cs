@@ -9,6 +9,7 @@ public class Booking
     public required TimeSpan Duration { get; set; }
     public required User User { get; set; }
     public required int UserId { get; set; }
+    public required User Mentor { get; set; }
     public required int MentorId { get; set; }
     public required bool IsConfirmed { get; set; }
 }

@@ -17,20 +17,24 @@ public class BuddySystemServices
 
     public async Task<(bool Success, string Message)> BookMentorsAsync(BookingRequest request, int userId)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.MentorId); // Look for the username that matches with the login username
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId); // Look for the user that matches the userId
+        User? mentor = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.MentorId); // Look for the mentor that matches the requested mentorId
+        if (mentor == null)
+            return (false, "Mentor doesn't exist!");
         if (user == null)
-            return (false, "Error!");
+            return (false, "User doesn't exist!");
 
         if (user.Role != Role.Student)
             return (false, "You must be a student to book a mentor");
 
-        // Create the user object
+        // Create the booking object
         Booking booking = new Booking
         {
             User = user,
             UserId = userId,
             StartTime = request.StartTime,
             Duration = request.Duration,
+            Mentor = mentor,
             MentorId = request.MentorId,
             IsConfirmed = false
         };
@@ -43,12 +47,14 @@ public class BuddySystemServices
 
     public async Task<(bool Success, string Message, List<BookingResponse> Bookings)> GetMentorBookingsAsync(int userId)
     {
-        List<Booking> bookings = await _context.Bookings.Include(b => b.User).Where(b => b.UserId == userId || b.MentorId == userId).ToListAsync();
+        List<Booking> bookings = await _context.Bookings.Include(b => b.User).Include(b => b.Mentor).Where(b => b.UserId == userId || b.MentorId == userId).ToListAsync();
+        Console.WriteLine(bookings.Count);
 
         List<BookingResponse> bookingsResponse = bookings.Select(b => new BookingResponse
         {
-            FirstName = b.User.FirstName,
-            LastName = b.User.LastName,
+            Id = b.Id,
+            FirstName = b.Mentor.FirstName,
+            LastName = b.Mentor.LastName,
             StartTime = b.StartTime,
             IsConfimed = b.IsConfirmed,
             Course = b.User.Course
