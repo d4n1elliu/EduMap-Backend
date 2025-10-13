@@ -39,17 +39,25 @@ public class BuddySystemServices
             IsConfirmed = false
         };
 
-        _context.Bookings.Add(booking); // Add the user object to the context
-        await _context.SaveChangesAsync(); // Save changes to the database
+        // Add the user object to the context
+        _context.Bookings.Add(booking);
+
+        // Save changes to the database
+        await _context.SaveChangesAsync();
 
         return (true, "Success");
     }
 
     public async Task<(bool Success, string Message, List<BookingResponse> Bookings)> GetMentorBookingsAsync(int userId)
     {
+        // Get all bookings where user is either the student (UserId) or the mentor (MentorId)
+        // Include related user and mentor data to avoid lazy loading issues
         List<Booking> bookings = await _context.Bookings.Include(b => b.User).Include(b => b.Mentor).Where(b => b.UserId == userId || b.MentorId == userId).ToListAsync();
+
+        // Debug output to check count
         Console.WriteLine(bookings.Count);
 
+        // Transform entity objects to response DTOs
         List<BookingResponse> bookingsResponse = bookings.Select(b => new BookingResponse
         {
             Id = b.Id,
@@ -59,15 +67,16 @@ public class BuddySystemServices
             IsConfimed = b.IsConfirmed,
             Course = b.User.Course
         }).ToList();
-
-
         return (true, "Success", bookingsResponse);
     }
 
+    // Retrieves all users with mentor role from the system
     public async Task<(bool Success, string Message, List<MentorResponse> Mentors)> GetMentorsAsync()
     {
+        // Get all users with mentor rol
         List<User> mentors = await _context.Users.Where(u => u.Role == Role.Mentor).ToListAsync();
 
+        // Transform entity objects to response DTOs
         List<MentorResponse> mentorsResponse = mentors.Select(u => new MentorResponse
         {
             Id = u.Id,
@@ -83,8 +92,10 @@ public class BuddySystemServices
         return (true, "Success", mentorsResponse);
     }
 
+    // Confirms a booking request (mentor accepting a student's booking)
     public async Task<(bool Success, string Message)> ConfirmBookingAsync(int userId, int bookingId)
-    {
+    {   
+        // Look for the user that matches the userId
         User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId); // Look for the username that matches with the userId
 
         if (user == null)
