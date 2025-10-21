@@ -44,7 +44,7 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlite("Data Source=database.sqlite"));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
         builder.Services.AddControllers();
 
         builder.Services.AddScoped<AuthService>();
