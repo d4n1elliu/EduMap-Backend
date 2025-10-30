@@ -27,8 +27,32 @@ public class AuthService
     {
         #region InputValidation
         // Checks if the email is already registered
-        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-            return (false, "Email is already registered.", null);
+        User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (existingUser != null)
+        {
+            bool mentorProfileExists = await _context.MentorProfiles.AnyAsync(m => m.UserId == existingUser.Id);
+            if (!mentorProfileExists && request.Role == Role.Mentor)
+            {
+                // Ignore warnings because those variables should always be included in a register request for mentors
+                MentorProfile newMentor = new MentorProfile
+                {
+                    User = existingUser,
+                    About = request.About,
+                    Longitude = (float)request.Longitude,
+                    Latitude = (float)request.Latitude,
+                };
+                _context.MentorProfiles.Add(newMentor);
+
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+
+                return (true, "Created mentor profile for existing user", null);
+            }
+            else
+            {
+                return (false, "Email is already registered.", null);
+            }
+        }
 
         // Validate email format using regex
         if (!IsValidEmail(request.Email))
@@ -61,6 +85,18 @@ public class AuthService
 
         // Add the user object to the context
         _context.Users.Add(newUser);
+
+        if (newUser.Role == Role.Mentor)
+        {
+            MentorProfile newMentor = new MentorProfile
+            {
+                User = newUser,
+                About = request.About,
+                Longitude = (float)request.Longitude,
+                Latitude = (float)request.Latitude,
+            };
+            _context.MentorProfiles.Add(newMentor);
+        }
 
         // Save changes to the database
         await _context.SaveChangesAsync();
