@@ -209,8 +209,10 @@ mentors = [
 # API endpoint URL for user registration
 url = "http://localhost:5046/api/Auth/register"
 
+mentor_url = "http://localhost:5046/api/mentorprofile"
+
 # Register a new user in the EduMap system via Auth API endpoint
-def register(email, password, firstName, lastName, role, about):
+def register(email, password, firstName, lastName, role):
 
     # Prepare the payload for the registration request
     payload = {
@@ -218,8 +220,7 @@ def register(email, password, firstName, lastName, role, about):
         "Password": password,
         "FirstName": firstName,
         "LastName": lastName,
-        "Role": role,
-        "About": about,
+        "Role": role
     }
 
     # Send POST request to the registration endpoint
@@ -231,6 +232,22 @@ def register(email, password, firstName, lastName, role, about):
 
     # Print registration result with user name for tracking
     print(firstName + " " + lastName + ":", message)
+    # return data.get("authData")
+
+def create_mentor_profile(userId, university, studies, skills, rating, reviews, about, image):
+    
+    payload = {
+        "userId": userId,
+        "university": university,
+        "studies": studies,
+        "skills": skills,
+        "rating": rating,
+        "reviews": reviews,
+        "about": about,
+        "image": image
+    }
+    response = requests.post(mentor_url, json=payload)
+    print("Mentor Profile Created -> ", response.json())
 
 # Loop through each key
 for mentor in mentors:
@@ -248,8 +265,18 @@ for mentor in mentors:
     # Role 1: represents Mentor role in the system
     role = 1
 
-    # Get the about text from dummy users
-    about = mentor["about"]
+    # Calling register function to create the mentor account
+    authData = register(email, password, firstName, lastName, role)
 
-     # Calling register function to create the mentor account
-    register(email, password, firstName, lastName, role, about)
+    # Extracting userId
+    # userId = authData["user"]["id"]
+    userId = mentor["userId"]
+    university = mentor["university"]
+    studies    = mentor["studies"]
+    skills     = mentor["skills"]
+    rating     = mentor["rating"]
+    reviews    = mentor["reviews"]
+    about      = mentor["about"]
+    image      = mentor["image"]
+
+    create_mentor_profile(userId, university, studies, skills, rating, reviews, about, image)

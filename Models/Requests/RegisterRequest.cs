@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using EduMap.Models.Entities;
 
 namespace EduMap.Models.Requests
@@ -9,5 +10,8 @@ namespace EduMap.Models.Requests
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required Role Role { get; set; }
+        public string? About { get; set; }
+        public float? Longitude { get; set;  }
+        public float? Latitude { get; set;  }
     }
 }

@@ -17,11 +17,11 @@ namespace EduMap.Controllers;
 [Route("api/[controller]")]
 public class BuddySystemController : ControllerBase
 {
-    private readonly BuddySystemServices _bookingService;
+    private readonly BuddySystemService _buddySystemService;
 
-    public BuddySystemController(BuddySystemServices bookingService)
+    public BuddySystemController(BuddySystemService buddySystemService)
     {
-        _bookingService = bookingService;
+        _buddySystemService = buddySystemService;
     }
     /* Creates a new booking session with a mentor
         Booking details including mentor ID, start time, and duration
@@ -31,7 +31,6 @@ public class BuddySystemController : ControllerBase
         User not authenticated */
         
     [Authorize] // Requires valid JWT token
-    [Authorize]
     [HttpPost("create-booking")]
     public async Task<IActionResult> CreateBooking([FromBody] BookingRequest request)
     {
@@ -43,7 +42,7 @@ public class BuddySystemController : ControllerBase
             return BadRequest(new ApiResponse<object>("Please relogin"));
 
         // Call service to create booking, passing the authenticated user's ID
-        var result = await _bookingService.BookMentorsAsync(request, int.Parse(userIdClaim));
+        var result = await _buddySystemService.BookMentorsAsync(request, int.Parse(userIdClaim));
 
         // Return error if booking creation failed
         if (!result.Success)
@@ -71,7 +70,7 @@ public class BuddySystemController : ControllerBase
             return BadRequest(new ApiResponse<object>("Please relogin"));
 
         // Call service to get bookings for the authenticated user
-        var result = await _bookingService.GetMentorBookingsAsync(int.Parse(userIdClaim));
+        var result = await _buddySystemService.GetMentorBookingsAsync(int.Parse(userIdClaim));
 
         // Return error if fetching bookings failed
         if (!result.Success)
@@ -80,7 +79,7 @@ public class BuddySystemController : ControllerBase
         // Return success response with bookings data
         return Ok(new ApiResponse<object>(result.Message, result.Bookings));
     }
-   
+
     /* Confirms a booking request (mentor accepting a student's booking)
     
         ID of the booking to confirm<
@@ -88,24 +87,19 @@ public class BuddySystemController : ControllerBase
         Booking confirmed successfully
         Invalid request or confirmation failed
         User not authenticated */
-     
+    [Authorize]
     [HttpPost("confirm-booking")]
     public async Task<IActionResult> ConfirmBookings([FromBody] int bookingId)
-    {   
-        if (!User.Identity.IsAuthenticated)
-        {
-            return Unauthorized(new ApiResponse<object>("Please relogin"));
-        }
-
+    {
         // Extracting user ID from JWT token claims
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
+
         // Validate that user ID claim exists
         if (string.IsNullOrEmpty(userIdClaim))
             return BadRequest(new ApiResponse<object>("Please relogin"));
 
         // Call service to confirm the booking
-        var result = await _bookingService.ConfirmBookingAsync(int.Parse(userIdClaim), bookingId);
+        var result = await _buddySystemService.ConfirmBookingAsync(int.Parse(userIdClaim), bookingId);
 
         // Return error if confirmation failed
         if (!result.Success)
@@ -113,6 +107,36 @@ public class BuddySystemController : ControllerBase
 
         // Return success response
         return Ok(new ApiResponse<object>(result.Message));
+    }
+
+    [Authorize]
+    [HttpPost("save-event")]
+    public async Task<IActionResult> SaveEvent(EventsRequest _event)
+    {
+        // Extracting user ID from JWT token claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Validate that user ID claim exists
+        if (string.IsNullOrEmpty(userIdClaim))
+            return BadRequest(new ApiResponse<object>("Please relogin"));
+
+        var result = await _buddySystemService.SaveEvent(_event, int.Parse(userIdClaim));
+        return Ok(new ApiResponse<object>(result.Message, result.Events));
+    }
+    
+    [Authorize]
+    [HttpGet("get-events")]
+    public async Task<IActionResult> GetEvents()
+    {
+        // Extracting user ID from JWT token claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        // Validate that user ID claim exists
+        if (string.IsNullOrEmpty(userIdClaim))
+            return BadRequest(new ApiResponse<object>("Please relogin"));
+
+        var result = await _buddySystemService.GetEvents(int.Parse(userIdClaim));
+        return Ok(new ApiResponse<object>(result.Message, result.Events));
     }
     
 
@@ -125,14 +149,22 @@ public class BuddySystemController : ControllerBase
     public async Task<IActionResult> GetMentors()
     {
         // Call service to get all mentors (no authentication required)
-        var result = await _bookingService.GetMentorsAsync();
+        var result = await _buddySystemService.GetMentorsAsync();
 
         // Return error if fetching mentors failed
         if (!result.Success)
-            return BadRequest(new ApiResponse<object>(result.Message));
+        return BadRequest(new ApiResponse<object>(result.Message));
 
         // Return success response with mentors data
         return Ok(new ApiResponse<object>(result.Message, result.Mentors));
+    }
+
+    // We won't use this for demo
+    [HttpPost("add-mentor")]
+    public async Task<IActionResult> CreateMentorProfile(CreateMentorProfileRequest profile)
+    {
+        var result = await _buddySystemService.CreateMentorProfile(profile);
+        return Ok(new ApiResponse<object>(result.Message));
     }
 }
 

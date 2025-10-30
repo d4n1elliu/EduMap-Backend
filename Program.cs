@@ -48,7 +48,7 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddScoped<AuthService>();
-        builder.Services.AddScoped<BuddySystemServices>();
+        builder.Services.AddScoped<BuddySystemService>();
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
