@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>EduMap_Backend</AssemblyName>
     <RootNamespace>EduMap_Backend</RootNamespace>
   </PropertyGroup>
 
