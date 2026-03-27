@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>EduMap_Backend</AssemblyName>
     <RootNamespace>EduMap_Backend</RootNamespace>
+    <UserSecretsId>547e9270-d420-4fbe-ba01-6909b972f5c1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -14,7 +14,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        DotEnv.Load();
+        // We are loading environment varriables from dotnet user-secrets instead of using a .env file. No need for the line below
+        //DotEnv.Load();
 
         var builder = WebApplication.CreateBuilder(args);
 
