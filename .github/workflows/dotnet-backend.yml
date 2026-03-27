@@ -8,12 +8,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Download Frontend Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: ./wwwroot # This places it exactly where .NET expects it
-
       - name: Download Frontend Artifacts from Frontend Repo
         uses: dawidd6/action-download-artifact@v6
         with:
