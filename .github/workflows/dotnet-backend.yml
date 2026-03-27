@@ -10,16 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download Frontend Artifacts from Frontend Repo
+      - name: Download Frontend Artifacts
         uses: dawidd6/action-download-artifact@v6
         with:
-          github_token: ${{ secrets.MY_GITHUB_PAT }} # Your PAT with repo access
+          github_token: ${{ secrets.MY_GITHUB_PAT }}
           repo: d4n1elliu/EduMap
+          workflow: Frontend Build.yml
           name: frontend-dist
           path: ./wwwroot
-          latest: true
-          workflow_conclusion: success
-          search_artifacts: true
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
