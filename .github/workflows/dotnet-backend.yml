@@ -15,7 +15,7 @@ jobs:
         with:
           github_token: ${{ secrets.MY_GITHUB_PAT }}
           repo: d4n1elliu/EduMap
-          workflow: Frontend Build.yml
+          workflow: frontend-deploy.yml
           name: frontend-dist
           path: ./wwwroot
 
