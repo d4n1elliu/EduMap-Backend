@@ -23,7 +23,7 @@ public class Program
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowFrontend",
-                policy => policy.WithOrigins(["http://localhost:5173",])
+                policy => policy.WithOrigins(["http://localhost:5173","edumap-gxf4bpfyg3ghbpgy.australiacentral-01.azurewebsites.net"])
                                 .AllowAnyHeader()
                                 .AllowAnyMethod()
                                 .AllowCredentials());
