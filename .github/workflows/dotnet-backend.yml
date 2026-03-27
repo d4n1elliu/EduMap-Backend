@@ -15,9 +15,10 @@ jobs:
         with:
           github_token: ${{ secrets.MY_GITHUB_PAT }} # Your PAT with repo access
           repo: d4n1elliu/EduMap
-          branch: main
           name: frontend-dist
           path: ./wwwroot
+          latest: true
+          workflow_conclusion: success
           search_artifacts: true
 
       - name: Setup .NET
