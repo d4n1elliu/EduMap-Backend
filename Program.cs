@@ -29,16 +29,10 @@ public class Program
                                 .AllowCredentials());
         });
 
+        // Local dev uses 5046. In production, Azure sets the port through ASPNETCORE_HTTP_PORTS
         if (builder.Environment.IsDevelopment())
         {
             builder.WebHost.UseUrls("http://localhost:5046");
-        }
-        else
-        {
-            builder.WebHost.ConfigureKestrel(serverOptions =>
-            {
-                serverOptions.ListenAnyIP(5046); // 0.0.0.0
-            });
         }
 
         // Services
