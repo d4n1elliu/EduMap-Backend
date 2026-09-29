@@ -15,10 +15,11 @@ public class BuddySystemService
         _context = context;
     }
 
+    // Creates an unconfirmed booking between a student and a mentor
     public async Task<(bool Success, string Message)> BookMentorsAsync(BookingRequest request, int userId)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId); // Look for the user that matches the userId
-        User? mentor = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.MentorId); // Look for the mentor that matches the requested mentorId
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        User? mentor = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.MentorId);
         if (mentor == null)
             return (false, "Mentor doesn't exist!");
         if (user == null)
@@ -27,7 +28,6 @@ public class BuddySystemService
         if (user.Role != Role.Student)
             return (false, "You must be a student to book a mentor");
 
-        // Create the booking object
         Booking booking = new Booking
         {
             User = user,
@@ -39,22 +39,17 @@ public class BuddySystemService
             IsConfirmed = false
         };
 
-        // Add the user object to the context
         _context.Bookings.Add(booking);
-
-        // Save changes to the database
         await _context.SaveChangesAsync();
 
         return (true, "Success");
     }
 
+    // Gets bookings where the user is the student or the mentor
     public async Task<(bool Success, string Message, List<BookingResponse> Bookings)> GetMentorBookingsAsync(int userId)
     {
-        // Get all bookings where user is either the student (UserId) or the mentor (MentorId)
-        // Include related user and mentor data to avoid lazy loading issues
         List<Booking> bookings = await _context.Bookings.Include(b => b.User).Include(b => b.Mentor).Where(b => b.UserId == userId || b.MentorId == userId).ToListAsync();
 
-        // Transform entity objects to response DTOs
         List<BookingResponse> bookingsResponse = bookings.Select(b => new BookingResponse
         {
             Id = b.Id,
@@ -69,13 +64,11 @@ public class BuddySystemService
         return (true, "Success", bookingsResponse);
     }
 
-    // Retrieves all users with mentor role from the system
+    // Lists all mentor profiles with their user details
     public async Task<(bool Success, string Message, List<MentorResponse> Mentors)> GetMentorsAsync()
     {
-        // Get all users with mentor rol
         var mentors = await _context.MentorProfiles.Include(x => x.User).ToListAsync();
 
-        // Transform entity objects to response DTOs
         List<MentorResponse> mentorsResponse = mentors.Select(m => new MentorResponse
         {
             Id = m.Id,
@@ -93,10 +86,10 @@ public class BuddySystemService
         return (true, "Success", mentorsResponse);
     }
 
-    // ✅ CREATE mentor profile entry
+    // Adds a mentor profile to an existing user
     public async Task<(bool Success, string Message)> CreateMentorProfile(CreateMentorProfileRequest profile)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId); // Look for the username that matches with the userId
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId);
         if (user == null)
             return (false, "Invalid user iD");
 
@@ -114,6 +107,7 @@ public class BuddySystemService
         return (true, "Success");
     }
 
+    // Saves an event, then returns all of the user's events
     public async Task<(bool Success, string Message, List<EventsResponse> Events)> SaveEvent(EventsRequest _event, int userId)
     {
         Event newEvent = new Event
@@ -154,6 +148,7 @@ public class BuddySystemService
         return (true, "Success", eventsResponse);
     }
 
+    // Gets the user's events, placed at each mentor's location
     public async Task<(bool Success, string Message, List<EventsResponse> Events)> GetEvents(int userId)
     {
         List<Event> events = await _context.Events.Where(e => e.StudentId == userId || e.MentorId == userId).ToListAsync();
@@ -182,11 +177,10 @@ public class BuddySystemService
         return (true, "Success", eventsResponse);
     }
 
-    // Confirms a booking request (mentor accepting a student's booking)
+    // Mentor accepts a student's booking
     public async Task<(bool Success, string Message)> ConfirmBookingAsync(int userId, int bookingId)
     {   
-        // Look for the user that matches the userId
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId); // Look for the username that matches with the userId
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null)
             return (false, "User not found");
@@ -194,7 +188,7 @@ public class BuddySystemService
         if (user.Role != Role.Mentor)
             return (false, "You must be a mentor to accept the booking");
 
-        Booking? booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId); // Look for the booking that matches with the bookingId
+        Booking? booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
 
         if (booking == null)
             return (false, "Booking not found");
@@ -207,8 +201,6 @@ public class BuddySystemService
             return (false, "Booking is already confirmed");
 
         booking.IsConfirmed = true;
-
-        // Save changes to the database
         await _context.SaveChangesAsync();
 
         return (true, "Booking confirmed");

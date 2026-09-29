@@ -3,8 +3,7 @@ import json
 import requests
 import datetime
 
-# List of mentor data to be registered into the system
-# Each mentor has detailed information including skills, university and profile data
+# Dummy mentors to seed into the database
 mentors = [
     {
         "id": 1,
@@ -206,15 +205,14 @@ mentors = [
     }
 ]
 
-# API endpoint URL for user registration
+# Register endpoint (backend must be running locally)
 url = "http://localhost:5046/api/Auth/register"
 
 mentor_url = "http://localhost:5046/api/mentorprofile"
 
-# Register a new user in the EduMap system via Auth API endpoint
+# Registers one user and prints the API's message
 def register(email, password, firstName, lastName, role):
 
-    # Prepare the payload for the registration request
     payload = {
         "Email": email,
         "Password": password,
@@ -223,14 +221,11 @@ def register(email, password, firstName, lastName, role):
         "Role": role
     }
 
-    # Send POST request to the registration endpoint
     response = requests.post(url, json=payload)
 
-    # Parse the JSON response
     data = response.json()
     message = data.get("message")
 
-    # Print registration result with user name for tracking
     print(firstName + " " + lastName + ":", message)
     # return data.get("authData")
 
@@ -249,23 +244,21 @@ def create_mentor_profile(userId, university, studies, skills, rating, reviews, 
     response = requests.post(mentor_url, json=payload)
     print("Mentor Profile Created -> ", response.json())
 
-# Loop through each key
+# Register every mentor
 for mentor in mentors:
 
-    # Extract first and last name from the mentor's full name
     firstName = mentor["name"].split()[0]
     lastName = mentor["name"].split()[1]
 
-    # Generate email using first-last name pattern
+    # e.g. Emma-Janice@edumap.com
     email = firstName + "-" + lastName + "@edumap.com"
 
-    # Default password for all mentor accounts (meets password requirements)
+    # Shared password that passes the backend's password rules
     password = "AAAA1234@a"
 
-    # Role 1: represents Mentor role in the system
+    # 1 = Mentor
     role = 1
 
-    # Calling register function to create the mentor account
     authData = register(email, password, firstName, lastName, role)
 
     # Extracting userId
