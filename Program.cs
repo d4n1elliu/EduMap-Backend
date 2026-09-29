@@ -14,12 +14,12 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        // We are loading environment varriables from dotnet user-secrets instead of using a .env file. No need for the line below
+        // Config comes from dotnet user-secrets, not a .env file
         //DotEnv.Load();
 
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add CORS policy
+        // Allow the frontend dev server and the deployed site
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowFrontend",
@@ -37,12 +37,11 @@ public class Program
         {
             builder.WebHost.ConfigureKestrel(serverOptions =>
             {
-                serverOptions.ListenAnyIP(5046); // Bind to 0.0.0.0
+                serverOptions.ListenAnyIP(5046); // 0.0.0.0
             });
         }
 
-        // Add services to the container.
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        // Services
         builder.Services.AddOpenApi();
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -76,10 +75,10 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI(); // Optional: UI at /swagger
+            app.UseSwaggerUI(); // /swagger
         }
 
-        // Custom middleware
+        // Validates the Bearer token and sets context.User
         app.Use(async (context, next) =>
         {
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
@@ -101,11 +100,11 @@ public class Program
                     };
 
                     var principal = handler.ValidateToken(token, validationParams, out _);
-                    context.User = principal; // Set the user manually
+                    context.User = principal;
                 }
                 catch
                 {
-                    // Token validation failed
+                    // Invalid token: carry on as anonymous
                 }
             }
             await next();
@@ -119,6 +118,7 @@ public class Program
         
         app.MapControllers();
 
+        // Serve the SPA for any unmatched route
         app.MapFallbackToFile("index.html");
 
         app.Run();

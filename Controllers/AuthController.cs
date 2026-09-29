@@ -7,10 +7,8 @@ using System.Security.Claims;
 
 namespace EduMap.Controllers;
 
-// Marks this class for APi controller with automatic HTTP 400 responses for invalid models
+// Routes: /api/auth/...
 [ApiController]
-
-// Set as the basic route for all the endpoints within this controller to /api/auth
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
@@ -21,11 +19,7 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    /* Register a new user in the system 
-        JWT token upon successful registration
-        Returns JWT token when registration is successful
-        Returns error message when registration fails */
-
+    // Registers a user and returns a JWT
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -37,12 +31,7 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<AuthResponse?>(result.Message, result.responseData));
     }
 
-    /* Authenticates an existing user and returns a JWT token
-        User login credentials (username/email and password)
-        JWT token upon successful authentication
-        Returns JWT token when login is successful
-        Returns error message when login fails */
-
+    // Logs in with email and password and returns a JWT
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -54,18 +43,11 @@ public class AuthController : ControllerBase
         return Ok(new ApiResponse<AuthResponse?>(result.Message, result.responseData));
     }
 
-   
-    /* Generates a new JWT token for an already authenticated user (token refresh)
-        Requires a valid JWT token in the Authorization header
-        New JWT token with extended expiration
-        Returns new JWT token
-        Returns error when user claim is invalid
-        Returns when no valid token is provided */
-        
+    // Issues a fresh JWT for a logged-in user
     [Authorize]
     [HttpPost("token")]
     public async Task<IActionResult> Token()
-    {   
+    {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(userIdClaim))
