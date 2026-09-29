@@ -13,5 +13,7 @@ namespace EduMap.Models.Requests
         public string? About { get; set; }
         public float? Longitude { get; set;  }
         public float? Latitude { get; set;  }
+        public Gender? Gender { get; set; }
+        public Course? Course { get; set; }
     }
 }
