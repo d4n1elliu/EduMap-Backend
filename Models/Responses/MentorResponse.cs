@@ -14,6 +14,7 @@ public class MentorResponse
     public required DateTime CreationDate { get; set; }
     public required Role Role { get; set; } = Role.Mentor;
     public string? Course { get; set; }
+    public string? Gender { get; set; }
     public required float Longitude { get; set;  }
     public required float Latitude { get; set;  }
     // public required List<Skill> Skills { get; set; } = new List<Skill>();

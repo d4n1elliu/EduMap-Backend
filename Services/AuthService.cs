@@ -77,6 +77,12 @@ public class AuthService
 
         if (request.Role == Role.Mentor && IsMissingMentorDetails(request))
             return (false, MissingMentorDetailsMessage, null);
+
+        if (request.Gender.HasValue && !Enum.IsDefined(request.Gender.Value))
+            return (false, "Gender is invalid.", null);
+
+        if (request.Course.HasValue && !Enum.IsDefined(request.Course.Value))
+            return (false, "Course is invalid.", null);
         #endregion
 
         User newUser = new User
@@ -86,7 +92,9 @@ public class AuthService
             CreationDate = DateTime.UtcNow,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Role = request.Role
+            Role = request.Role,
+            Gender = request.Gender,
+            Course = request.Course
         };
 
         _context.Users.Add(newUser);

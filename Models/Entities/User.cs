@@ -14,5 +14,6 @@ public class User
     public required DateTime CreationDate { get; set; }
     public required Role Role { get; set; } = Role.Student;
     public Course? Course { get; set; }
+    public Gender? Gender { get; set; }
 }
 

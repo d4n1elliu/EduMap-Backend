@@ -79,7 +79,8 @@ public class BuddySystemService
             ProfileEmoji = m.User.ProfileEmoji,
             CreationDate = m.User.CreationDate,
             Role = m.User.Role,
-            Course = m.User.Course.ToString(),
+            Course = m.User.Course?.ToString(),
+            Gender = m.User.Gender?.ToString(),
             Longitude = m.Longitude,
             Latitude = m.Latitude,
         }).ToList();
