@@ -191,10 +191,25 @@ public class BuddySystemService
         if (user == null)
             return (false, "User not found");
 
-        if (user.Role != Role.Student)
+        if (user.Role != Role.Mentor)
             return (false, "You must be a mentor to accept the booking");
 
         Booking? booking = await _context.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId); // Look for the booking that matches with the bookingId
+
+        if (booking == null)
+            return (false, "Booking not found");
+
+        // Only the mentor the booking was made with can confirm it
+        if (booking.MentorId != userId)
+            return (false, "You can only confirm your own bookings");
+
+        if (booking.IsConfirmed)
+            return (false, "Booking is already confirmed");
+
+        booking.IsConfirmed = true;
+
+        // Save changes to the database
+        await _context.SaveChangesAsync();
 
         return (true, "Booking confirmed");
     }
