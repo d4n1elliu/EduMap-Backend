@@ -15,6 +15,9 @@ public class AuthService
 {
     private readonly AppDbContext _context;
 
+    private const string MissingMentorDetailsMessage =
+        "Mentors must provide an About section and a location (longitude and latitude).";
+
     public AuthService(AppDbContext context)
     {
         _context = context;
@@ -24,15 +27,20 @@ public class AuthService
     public async Task<(bool Success, string Message, AuthResponse? responseData)>
         RegisterUserAsync(RegisterRequest request)
     {
+        // Store and compare emails in lowercase so lookups are case-insensitive
+        string email = request.Email.Trim().ToLowerInvariant();
+
         #region InputValidation
         // Email taken: allow adding a mentor profile, otherwise reject
-        User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        User? existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (existingUser != null)
         {
             bool mentorProfileExists = await _context.MentorProfiles.AnyAsync(m => m.UserId == existingUser.Id);
             if (!mentorProfileExists && request.Role == Role.Mentor)
             {
-                // Mentor requests always include About/Longitude/Latitude
+                if (IsMissingMentorDetails(request))
+                    return (false, MissingMentorDetailsMessage, null);
+
                 MentorProfile newMentor = new MentorProfile
                 {
                     User = existingUser,
@@ -51,7 +59,7 @@ public class AuthService
             }
         }
 
-        if (!IsValidEmail(request.Email))
+        if (!IsValidEmail(email))
             return (false, "Email is invalid.", null);
 
         // Password rules
@@ -66,11 +74,14 @@ public class AuthService
 
         if (!request.Password.Any(c => !char.IsLetterOrDigit(c)))
             return (false, "Password must contain a special character", null);
+
+        if (request.Role == Role.Mentor && IsMissingMentorDetails(request))
+            return (false, MissingMentorDetailsMessage, null);
         #endregion
 
         User newUser = new User
         {
-            Email = request.Email,
+            Email = email,
             PasswordHash = HashPassword(request.Password),
             CreationDate = DateTime.UtcNow,
             FirstName = request.FirstName,
@@ -106,7 +117,9 @@ public class AuthService
     // Logs in with email and password and returns a JWT
     public async Task<(bool Success, string Message, AuthResponse? responseData)> LoginUserAsync(LoginRequest request)
     {
-        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Username);
+        string email = request.Username.Trim().ToLowerInvariant();
+
+        User? user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
             return (false, "Invalid username/email or password.", null);
@@ -118,7 +131,6 @@ public class AuthService
 
         // Sanity-check the new token
         var isValid = ValidateToken(responseData.JwtToken);
-        Console.WriteLine(responseData.JwtToken);
 
         if (!isValid)
         {
@@ -143,6 +155,14 @@ public class AuthService
             JwtToken = GenerateJwtToken(user)
         };
         return (true, "Successfully logged in.", authResponse);
+    }
+
+    // True when a mentor request is missing About, Longitude or Latitude
+    private static bool IsMissingMentorDetails(RegisterRequest request)
+    {
+        return string.IsNullOrWhiteSpace(request.About)
+            || request.Longitude == null
+            || request.Latitude == null;
     }
 
     // Checks a JWT's signature, expiry, issuer and audience
@@ -210,11 +230,6 @@ public class AuthService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         };
 
-        // Debug output. Remove in production (prints the secret key)
-        Console.WriteLine(Environment.GetEnvironmentVariable("Jwt_Issuer"));
-        Console.WriteLine(Environment.GetEnvironmentVariable("Jwt_Audience"));
-        Console.WriteLine(Environment.GetEnvironmentVariable("Jwt_SecretKey"));
-
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Jwt_SecretKey")));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -240,4 +255,3 @@ public class AuthService
         return BCrypt.Net.BCrypt.Verify(password, storedHash);
     }
 }
-

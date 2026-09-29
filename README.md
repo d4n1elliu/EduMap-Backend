@@ -1,3 +1,3 @@
 # Backend for the EduMap Capstone Project
 
-Made with ASP.NET Web API & PostgreSQL (SuperBase)
+Made with ASP.NET Web API & PostgreSQL (Neon)

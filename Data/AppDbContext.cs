@@ -17,6 +17,11 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // One account per email (emails are stored lowercase by AuthService)
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
         modelBuilder.Entity<MentorProfile>()
             .HasOne(mp => mp.User)
             .WithOne()
@@ -24,4 +29,3 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
-
