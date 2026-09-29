@@ -24,7 +24,8 @@ public class BuddySystemService
             return (false, "Mentor doesn't exist!");
         if (user == null)
             return (false, "User doesn't exist!");
-
+        if (mentor.Role != Role.Mentor)
+            return (false, "That user isn't a mentor");
         if (user.Role != Role.Student)
             return (false, "You must be a student to book a mentor");
 
@@ -71,7 +72,7 @@ public class BuddySystemService
 
         List<MentorResponse> mentorsResponse = mentors.Select(m => new MentorResponse
         {
-            Id = m.Id,
+            Id = m.UserId,
             Email = m.User.Email,
             FirstName = m.User.FirstName,
             LastName = m.User.LastName,
