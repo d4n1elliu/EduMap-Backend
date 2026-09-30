@@ -73,7 +73,6 @@ public class BuddySystemService
         List<MentorResponse> mentorsResponse = mentors.Select(m => new MentorResponse
         {
             Id = m.UserId,
-            Email = m.User.Email,
             FirstName = m.User.FirstName,
             LastName = m.User.LastName,
             ProfileEmoji = m.User.ProfileEmoji,
