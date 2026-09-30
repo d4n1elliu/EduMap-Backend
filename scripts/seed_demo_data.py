@@ -1,3 +1,4 @@
+# Registers the demo mentors and students against a local backend
 import json
 import urllib.request
 import urllib.error
@@ -15,42 +16,49 @@ campus_coords = {
     "Western University": (-33.8150, 151.0011),
 }
 
+# Must match the backend enums
+genders = {"Female": 0, "Male": 1, "NonBinary": 2, "PreferNotToSay": 3}
+courses = {
+    "InformationTechnology": 0, "ComputerScience": 1, "Business": 2, "Law": 3, "Science": 4, "Engineering": 5,
+    "Communications": 6, "Architecture": 7, "Health": 8, "Mathematics": 9, "InternationalStudies": 10, "Education": 11,
+}
+
 mentors = [
-    {"name": "Emma Janice", "university": "University of Technology Sydney",
+    {"name": "Emma Janice", "gender": "Female", "course": "ComputerScience", "university": "University of Technology Sydney",
      "about": "Passionate computer science student with experience in web development and programming. I love helping others learn and grow in their coding journey."},
-    {"name": "Alex Chen", "university": "University of Sydney",
+    {"name": "Alex Chen", "gender": "Male", "course": "Business", "university": "University of Sydney",
      "about": "Business student with internship experience at top consulting firms. I specialise in helping students develop professional skills and career planning."},
-    {"name": "Sarah Williams", "university": "University of New South Wales",
+    {"name": "Sarah Williams", "gender": "Female", "course": "Law", "university": "University of New South Wales",
      "about": "Law student passionate about justice and helping others understand legal concepts. I enjoy mentoring first-year students."},
-    {"name": "Michael Rodriguez", "university": "University of Technology Sydney",
+    {"name": "Michael Rodriguez", "gender": "Male", "course": "InformationTechnology", "university": "University of Technology Sydney",
      "about": "IT professional with focus on cybersecurity. I help students understand complex technical concepts and prepare for industry."},
-    {"name": "Danny Lim", "university": "University of Technology Sydney",
+    {"name": "Danny Lim", "gender": "Male", "course": "Engineering", "university": "University of Technology Sydney",
      "about": "IT professional with focus on cybersecurity. I help students understand complex technical concepts and prepare for industry."},
-    {"name": "Brenden Yung", "university": "University of New South Wales",
+    {"name": "Brenden Yung", "gender": "Male", "course": "InformationTechnology", "university": "University of New South Wales",
      "about": "IT professional with focus on cybersecurity. I help students understand complex technical concepts and prepare for industry."},
-    {"name": "Jennie Patel", "university": "Macquarie University",
+    {"name": "Jennie Patel", "gender": "Female", "course": "Engineering", "university": "Macquarie University",
      "about": "Aspiring engineer passionate about robotics and design thinking. I enjoy mentoring students on building real-world engineering projects."},
-    {"name": "James O'Connor", "university": "University of Sydney",
+    {"name": "James O'Connor", "gender": "Male", "course": "Communications", "university": "University of Sydney",
      "about": "Communication student with experience in media projects. I like helping peers gain confidence in speaking and presenting ideas."},
-    {"name": "Hannah Kim", "university": "University of New South Wales",
+    {"name": "Hannah Kim", "gender": "Female", "course": "Law", "university": "University of New South Wales",
      "about": "Law student with a focus on contract law. I enjoy guiding others in building strong analytical skills and preparing for mooting competitions."},
-    {"name": "Carlos Martinez", "university": "Western University",
+    {"name": "Carlos Martinez", "gender": "Male", "course": "InternationalStudies", "university": "Western University",
      "about": "International Studies student interested in cultural exchange and policy-making. I mentor students on adapting to diverse environments."},
-    {"name": "Emily Zhang", "university": "University of Sydney",
+    {"name": "Emily Zhang", "gender": "Female", "course": "Health", "university": "University of Sydney",
      "about": "Health sciences student passionate about improving community well-being. I mentor students who want to pursue careers in healthcare."},
-    {"name": "Sung Jing Woo", "university": "University of Technology Sydney",
+    {"name": "Sung Jing Woo", "gender": "Male", "course": "InformationTechnology", "university": "University of Technology Sydney",
      "about": "Passionate software developer with expertise in C#, .NET, Python, and Linux. Dedicated to creating innovative solutions and mentoring others in technology and career development."},
-    {"name": "Johnny Zhang", "university": "Macquarie University",
+    {"name": "Johnny Zhang", "gender": "Male", "course": "InternationalStudies", "university": "Macquarie University",
      "about": "Enthusiastic International Studies and Business student with a strong interest in global markets, cross-cultural communication and advertising. I enjoy mentoring peers on developing language skills, teamwork strategies and marketing projects that connect cultures and businesses."},
-    {"name": "Victor Zhong", "university": "University of New South Wales",
+    {"name": "Victor Zhong", "gender": "Male", "course": "Architecture", "university": "University of New South Wales",
      "about": "Sustainable-design enthusiast. Happy to help with studio crits, portfolio layout and CAD fundamentals."},
-    {"name": "Hector Lim", "university": "University of Sydney",
+    {"name": "Hector Lim", "gender": "Male", "course": "Mathematics", "university": "University of Sydney",
      "about": "Patient explainer of tough proofs and problem-solving strategies. Can guide exam prep and LaTeX write-ups."},
-    {"name": "David Lee", "university": "University of Technology Sydney",
+    {"name": "David Lee", "gender": "Male", "course": "InternationalStudies", "university": "University of Technology Sydney",
      "about": "Focus on Asia-Pacific studies. I help with essay structure, research methods and presentation polish."},
-    {"name": "Mia Su", "university": "Western University",
+    {"name": "Mia Su", "gender": "Female", "course": "Education", "university": "Western University",
      "about": "Pre-service teacher passionate about inclusive learning. I can review lesson plans and share prac tips."},
-    {"name": "Jay Kim", "university": "Western University",
+    {"name": "Jay Kim", "gender": "Male", "course": "Education", "university": "Western University",
      "about": "Pre-service teacher focused on inclusive learning. I can review lesson plans, share prac tips and discuss classroom strategies."},
 ]
 
@@ -95,6 +103,8 @@ for i, mentor in enumerate(mentors):
         "About": mentor["about"],
         "Latitude": lat + offset,
         "Longitude": lng + offset,
+        "Gender": genders[mentor["gender"]],
+        "Course": courses[mentor["course"]],
     })
 
 # Students (Role 0)
