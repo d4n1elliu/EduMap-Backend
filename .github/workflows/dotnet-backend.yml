@@ -10,12 +10,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Find latest Frontend Build on main
+        id: frontend
+        env:
+          GH_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+        run: |
+          run=$(gh run list -R d4n1elliu/EduMap -w frontend-deploy.yml -b main -s success -L 1 \
+            --json databaseId,headSha,createdAt --jq '.[0]')
+          if [ -z "$run" ] || [ "$run" = "null" ]; then
+            echo "No successful Frontend Build run found on main"
+            exit 1
+          fi
+          echo "Frontend Build run $(jq -r .databaseId <<< "$run"), commit $(jq -r .headSha <<< "$run"), built $(jq -r .createdAt <<< "$run")"
+          echo "run_id=$(jq -r .databaseId <<< "$run")" >> "$GITHUB_OUTPUT"
+
+      - name: Clear wwwroot
+        run: rm -rf ./wwwroot
+
       - name: Download Frontend Artifacts
         uses: dawidd6/action-download-artifact@v6
         with:
           github_token: ${{ secrets.MY_GITHUB_PAT }}
           repo: d4n1elliu/EduMap
-          workflow: frontend-deploy.yml
+          run_id: ${{ steps.frontend.outputs.run_id }}
           name: frontend-dist
           path: ./wwwroot
 
